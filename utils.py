@@ -27,6 +27,43 @@ def mapt(fn, *args):
     return tuple(map(fn, *args))
 
 
+def test(DAY, parser, part1=lambda x:None, results_part_1=[], part2=lambda x:None, results_part_2=[]):
+
+    if results_part_1 or results_part_2:
+        print('TESTS')
+    else:
+        return
+
+    if results_part_1:
+        print('Part 1:')
+
+    for test_i, test_result in enumerate(results_part_1, 1):
+        input = parser(test=test_i)
+        result = part1(input)
+        if result == test_result:
+            print(f'Test {test_i} CORRECT')
+        else:
+            print(f'Test {test_i} FAILED')
+            print(f'  result: {result}')
+            raise AssertionError
+    
+
+    if results_part_2:
+        print('Part 2:')
+
+    for test_i, test_result in enumerate(results_part_2, 1):
+        input = parser(test=test_i)
+        result = part2(input)
+        if result == test_result:
+            print(f'Test {test_i} CORRECT')
+        else:
+            print(f'Test {test_i} FAILED')
+            print(f'  result: {result}')
+            raise AssertionError
+
+    print('-----------------------------------------\n')
+
+
 # Graphs
 
 def addc(a, b):
