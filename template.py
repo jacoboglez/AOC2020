@@ -6,7 +6,7 @@ DAY = 0
 from utils import *
 
 
-def parser(test=False)
+def parser(test=False):
     return Input(DAY, 2020, test=test)
 
 
