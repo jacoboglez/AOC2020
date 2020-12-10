@@ -6,6 +6,9 @@ DAY = 10
 from utils import *
 
 
+MEMO = {}
+
+
 def parser(test=False):
     return sorted([int(i) for i in Input(DAY, 2020, test=test)])
 
@@ -25,11 +28,10 @@ def part1(input):
 
 
 def memoize(f):
-    memo = {}
     def helper(x, input):
-        if x not in memo:            
-            memo[x] = f(x, input)
-        return memo[x]
+        if x not in MEMO:            
+            MEMO[x] = f(x, input)
+        return MEMO[x]
     return helper
 
 
@@ -46,6 +48,7 @@ def combinations_from(x, input):
 
 
 def part2(input):
+    MEMO.clear()
     return combinations_from(0, input)
     
 
@@ -61,5 +64,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # test(DAY, parser, part1, [35, 220], part2, [8, 19208])
+    test(DAY, parser, part1, [35, 220], part2, [8, 19208])
     main()
