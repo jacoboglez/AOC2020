@@ -27,6 +27,21 @@ def parser(test=False):
     return np.array(seats)
 
 
+def print_state(state, seats):
+    room = ''
+    for r, row in enumerate(state):
+        for c, s in enumerate(row):
+            if s:
+                room += '#'
+            else: 
+                if seats[r,c]:
+                    room += 'L'
+                else:
+                    room += '.'
+        room += '\n'
+    print(room)
+
+
 def update(state, seats):
     ''' Rules:
     If a seat is empty (0) and there are no occupied seats adjacent to it, the seat becomes occupied.
@@ -43,21 +58,6 @@ def update(state, seats):
     new_state += state & (adjacents < 4)
 
     return new_state
-
-
-def print_state(state, seats):
-    room = ''
-    for r, row in enumerate(state):
-        for c, s in enumerate(row):
-            if s:
-                room += '#'
-            else: 
-                if seats[r,c]:
-                    room += 'L'
-                else:
-                    room += '.'
-        room += '\n'
-    print(room)
 
 
 def part1(seats):
@@ -77,9 +77,69 @@ def part1(seats):
             return np.sum(state)
 
 
-def part2(input):
-    pass
+def update2(state, seats):
+    seats_indices = np.nonzero(seats)
+    new_state = np.zeros([np.size(state, 0), np.size(state, 1)], dtype = int)
+
+    for i, (r, c) in enumerate( zip(*seats_indices) ):
+        # print(f'Seat: {r}, {c}')
+        # Same row, left and right
+        left_idx = np.nonzero( seats[r,:c] )[0][-1:]
+        left = state[r,:c][left_idx]
+        right_idx = np.nonzero( seats[r,c+1:] )[0][:1]
+        right = state[r,c+1:][right_idx]
     
+        # Same column, above and below
+        above_idx = np.nonzero( seats[:r,c] )[0][-1:]
+        above = state[:r,c][ np.nonzero( seats[:r,c])[0][-1:]]
+        below_idx = np.nonzero( seats[r+1:,c:] )[0][:1]
+        below = state[r+1:,c][np.nonzero( seats[r+1:,c] )[0][:1]]
+
+        # Diagonals
+        # Above and left (main diagonal)
+        al_idx = np.nonzero( np.flipud(np.fliplr(seats[:r,:c])).diagonal() )[0][:1]
+        al = np.flipud(np.fliplr(state[:r,:c])).diagonal()[al_idx]
+        
+        # Below and right (main diagonal)
+        br_idx = np.nonzero( seats[r+1:,c+1:].diagonal() )[0][:1]
+        br = state[r+1:,c+1:][br_idx, br_idx]
+
+        # Above and right (flipped diagonal)
+        ar_idx = np.nonzero( np.flipud( seats[:r,c+1:] ).diagonal() )[0][:1]
+        ar = np.flipud( state[:r,c+1:] ).diagonal()[ar_idx]
+
+        # Below and left (flipped diagonal)
+        bl_idx = np.nonzero( np.fliplr( seats[r+1:,:c] ).diagonal() )[0][:1]
+        bl = np.fliplr( state[r+1:,:c] ).diagonal()[bl_idx]
+
+        # Apply rules
+        occupied = sum(left) + sum(right) + sum(above) + sum(below) + sum(al) + sum(br) + sum(ar) + sum(bl)
+        if state[r,c] and (occupied < 5):
+            new_state[r,c] = 1
+        elif not state[r,c] and (not occupied):
+            new_state[r,c] = 1
+        elif state[r,c] and (occupied >= 5):
+            pass
+
+    return new_state
+
+
+def part2(seats):
+    # Everything is empty
+    state = np.zeros([np.size(seats, 0), np.size(seats, 1)], dtype = int) 
+    # print_state(state, seats)
+
+    t = 0
+    while True:
+        t += 1
+        prev_state = np.copy(state)
+        state = update2(state, seats)
+        # print_state(state, seats)
+        if (state==prev_state).all():
+            # print_state(state, seats)
+            # print_state(prev_state, seats)
+            return np.sum(state)
+
 
 def main():
     input = parser()
@@ -93,5 +153,5 @@ def main():
 
 
 if __name__ == "__main__":
-    test(DAY, parser, part1, [37], part2, [])
+    test(DAY, parser, part1, [37], part2, [26])
     main()
