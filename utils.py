@@ -67,8 +67,22 @@ def test(DAY, parser, part1=lambda x:None, results_part_1=[], part2=lambda x:Non
 # Graphs
 
 def addc(a, b):
-    ''' Add two coordinates by components.'''
-    return (a[0] + b[0], a[1] + b[1])
+    ''' Add two coordinates by components, or a coordinate and a scalar'''
+    if isinstance(b, tuple):
+        return (a[0]+b[0], a[1]+b[1])
+    elif isinstance(b, int):
+        return (a[0]+b, a[1]+b)
+    else:
+        raise NotImplementedError
+
+def mulc(a, b):
+    ''' Add two coordinates by components, or a coordinate and a scalar'''
+    if isinstance(b, tuple):
+        return (a[0]*b[0], a[1]*b[1])
+    elif isinstance(b, int):
+        return (a[0]*b, a[1]*b)
+    else:
+        raise NotImplementedError
 
 
 def paint(mapp, legend, default = 0):
