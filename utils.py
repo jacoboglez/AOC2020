@@ -38,6 +38,8 @@ def test(DAY, parser, part1=lambda x:None, results_part_1=[], part2=lambda x:Non
         print('Part 1:')
 
     for test_i, test_result in enumerate(results_part_1, 1):
+        if not test_result:
+            continue
         input = parser(test=test_i)
         result = part1(input)
         if result == test_result:
@@ -52,6 +54,8 @@ def test(DAY, parser, part1=lambda x:None, results_part_1=[], part2=lambda x:Non
         print('Part 2:')
 
     for test_i, test_result in enumerate(results_part_2, 1):
+        if not test_result:
+            continue
         input = parser(test=test_i)
         result = part2(input)
         if result == test_result:
