@@ -62,9 +62,53 @@ def part1(input):
     return checksum
 
 
-def part2(input):
-    pass
+def invalid_fields(rules, value):
+    invalid_fields = set()
+    for rule, (min1, max1, min2, max2) in rules.items():
+        if not (min1 <= value <= max1) and not (min2 <= value <= max2): 
+            # This rule doesn't match
+            invalid_fields.add(rule)
     
+    return invalid_fields
+
+
+def part2(input):
+    rules, my_ticket, nearby_tickets = input
+    valid_tickets = [t for t in nearby_tickets if not check_rules(rules, t)]
+    possible_fields = {i: list(rules.keys()) for i in range(len(rules))}
+
+    # Check possible fields according to tickets and rules
+    for ticket in valid_tickets:
+        for i, value in enumerate(ticket):
+            invalid = invalid_fields(rules, value)
+            possible_fields[i] = [f for f in possible_fields[i] if f not in invalid]
+    # print(f'possible_fields: {possible_fields}')
+
+    # Reduce the fields. Delete the ones we know are unique
+    to_clean = set()
+    while True: # I guess not optimal algorithm to search unique fields
+        fields = {}
+        for i, possible in possible_fields.items():
+            if len(possible) == 1:
+                to_clean.add(possible[0])
+                fields[i] = possible
+            else:
+                fields[i] = [p for p in possible if p not in to_clean]
+
+        if sum( [len(l) for l in fields.values()] ) == len(fields):
+            break
+        else:
+            possible_fields = fields.copy()
+    # print(f'fields: {fields}')
+
+    # Return the answer of the puzzle
+    checkmult = 1
+    for i, f in fields.items():
+        if f[0].find('departure') == 0: #The field starts with departure...
+            checkmult *= my_ticket[i]
+            
+    return checkmult
+
 
 def main():
     input = parser()
@@ -78,5 +122,5 @@ def main():
 
 
 if __name__ == "__main__":
-    test(DAY, parser, part1, [71], part2, [])
+    test(DAY, parser, part1, [71], part2, []) # Set to [False, 0] to debug part 2
     main()
