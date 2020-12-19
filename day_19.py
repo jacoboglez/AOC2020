@@ -4,7 +4,7 @@ https://adventofcode.com/2020/day/19
 DAY = 19
 
 from utils import *
-import re
+import regex as re
 
 
 def parser(test=False):
@@ -52,24 +52,26 @@ def part2(input):
        8: 42 | 42 8 -> 42 | 42 42 | 42 42 42 | ...
        11: 42 31 | 42 11 31 -> 42 31 | 42 42 31 31 | 42 42 ... 31 31 ...
        This means:
-       0: 42+ 42{n} 31{n}'''
+       0: 42+ 42{n} 31{n}
+       or
+       0: 42{m} 31{n} with m > n'''
 
     rules, message = input
     regex_42 = generate_regex(rules, 42)
     regex_31 = generate_regex(rules, 31)
 
+    regex_expression = f'(?P<g42>{regex_42})+(?P<g31>{regex_31})+$'
+    pattern = re.compile(regex_expression)
+    
     counter = 0
     for line in message:
-        for n in range(1,100):
-            regex_expression = f'{regex_42}+{regex_42}{{{n}}}{regex_31}{{{n}}}$'
-            pattern = re.compile(regex_expression)
-            found = pattern.match(line)
-            if found:
+        found = pattern.match(line)
+        if found: # It matched 42+31+ (m 42 and n 31)
+            d = found.capturesdict()
+            if len(d['g42']) > len(d['g31']): # Check that m > n
                 counter += 1
-                break
-
     return counter
-    
+
 
 def main():
     input = parser()
